@@ -23,6 +23,10 @@ dependencies:
 - machines
 - algebraic-graphs
 - ansi-terminal
+- envparse
+- req
+- bytestring
+- mtl
 
 default-extensions:
 - OverloadedStrings

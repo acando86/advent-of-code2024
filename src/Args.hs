@@ -5,6 +5,7 @@ import Options.Applicative
 data Command
   = Run Args
   | Generate GenerateArgs
+  | GetStats StatsArgs
   deriving (Eq, Show)
 
 data Args = Args
@@ -14,6 +15,8 @@ data Args = Args
   deriving (Eq, Show)
 
 newtype GenerateArgs = GenerateArgs Int deriving (Eq, Show)
+data StatsOutput = ConsoleOutput | UpdateReadme deriving (Eq, Show)
+data StatsArgs = StatsArgs Int StatsOutput deriving (Eq, Show)
 
 argsParser :: Parser Args
 argsParser =
@@ -39,12 +42,30 @@ generateArgsParser =
           <> short 'd'
           <> help "day"
       )
+statsArgsParser :: Parser StatsArgs
+statsArgsParser =
+  StatsArgs
+    <$> option
+      auto
+      ( long "year"
+          <> short 'y'
+          <> value 2024
+          <> showDefault
+          <> help "year"
+      )
+    <*> flag
+      ConsoleOutput
+      UpdateReadme
+      ( long "export"
+          <> help "Export to readme"
+      )
 
 commandParser :: Parser Command
 commandParser =
   hsubparser
     ( command "run" (info (Run <$> argsParser) (progDesc "run the solution to the puzzle"))
         <> command "generate" (info (Generate <$> generateArgsParser) (progDesc "generate scaffolding from template for a given day"))
+        <> command "stats" (info (GetStats <$> statsArgsParser) (progDesc "retrieve stats from the AOC website"))
     )
 
 withInfo :: Parser a -> String -> ParserInfo a
